@@ -5,63 +5,63 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyProtocolsAPI_JosephGF.Models;
 using MyProtocolsAPI_JosephGF.Attributes;
+using MyProtocolsAPI_JosephGF.Models;
 
 namespace MyProtocolsAPI_JosephGF.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Apikey]
-    public class UserRolesController : ControllerBase
+    public class ProtocolsController : ControllerBase
     {
         private readonly MyProtocolsDBContext _context;
 
-        public UserRolesController(MyProtocolsDBContext context)
+        public ProtocolsController(MyProtocolsDBContext context)
         {
             _context = context;
         }
 
-        // GET: api/UserRoles
+        // GET: api/Protocols
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserRole>>> GetUserRoles()
+        public async Task<ActionResult<IEnumerable<Protocol>>> GetProtocols()
         {
-          if (_context.UserRoles == null)
+          if (_context.Protocols == null)
           {
               return NotFound();
           }
-            return await _context.UserRoles.ToListAsync();
+            return await _context.Protocols.ToListAsync();
         }
 
-        // GET: api/UserRoles/5
+        // GET: api/Protocols/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserRole>> GetUserRole(int id)
+        public async Task<ActionResult<Protocol>> GetProtocol(int id)
         {
-          if (_context.UserRoles == null)
+          if (_context.Protocols == null)
           {
               return NotFound();
           }
-            var userRole = await _context.UserRoles.FindAsync(id);
+            var protocol = await _context.Protocols.FindAsync(id);
 
-            if (userRole == null)
+            if (protocol == null)
             {
                 return NotFound();
             }
 
-            return userRole;
+            return protocol;
         }
 
-        // PUT: api/UserRoles/5
+        // PUT: api/Protocols/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUserRole(int id, UserRole userRole)
+        public async Task<IActionResult> PutProtocol(int id, Protocol protocol)
         {
-            if (id != userRole.UserRoleId)
+            if (id != protocol.ProtocolId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(userRole).State = EntityState.Modified;
+            _context.Entry(protocol).State = EntityState.Modified;
 
             try
             {
@@ -69,7 +69,7 @@ namespace MyProtocolsAPI_JosephGF.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserRoleExists(id))
+                if (!ProtocolExists(id))
                 {
                     return NotFound();
                 }
@@ -82,24 +82,26 @@ namespace MyProtocolsAPI_JosephGF.Controllers
             return NoContent();
         }
 
-        // POST: api/UserRoles
+        // POST: api/Protocols
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<UserRole>> PostUserRole(UserRole userRole)
+        public async Task<ActionResult<Protocol>> PostProtocol(Protocol protocol)
         {
-          if (_context.UserRoles == null)
+          if (_context.Protocols == null)
           {
-              return Problem("Entity set 'MyProtocolsDBContext.UserRoles'  is null.");
+              return Problem("Entity set 'MyProtocolsDBContext.Protocols'  is null.");
           }
-            _context.UserRoles.Add(userRole);
+            _context.Protocols.Add(protocol);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUserRole", new { id = userRole.UserRoleId }, userRole);
+            return CreatedAtAction("GetProtocol", new { id = protocol.ProtocolId }, protocol);
         }
 
-        private bool UserRoleExists(int id)
+       
+
+        private bool ProtocolExists(int id)
         {
-            return (_context.UserRoles?.Any(e => e.UserRoleId == id)).GetValueOrDefault();
+            return (_context.Protocols?.Any(e => e.ProtocolId == id)).GetValueOrDefault();
         }
     }
 }

@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyProtocolsAPI_JosephGF.Attributes;
 using MyProtocolsAPI_JosephGF.Models;
 
 namespace MyProtocolsAPI_JosephGF.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Apikey]
     public class UsersController : ControllerBase
     {
         private readonly MyProtocolsDBContext _context;
@@ -114,6 +116,7 @@ namespace MyProtocolsAPI_JosephGF.Controllers
 
             return NoContent();
         }
+
 
         private bool UserExists(int id)
         {
