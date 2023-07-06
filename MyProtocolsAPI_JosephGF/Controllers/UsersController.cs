@@ -12,7 +12,7 @@ namespace MyProtocolsAPI_JosephGF.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Apikey]
+    //[Apikey]
     public class UsersController : ControllerBase
     {
         private readonly MyProtocolsDBContext _context;
@@ -49,6 +49,19 @@ namespace MyProtocolsAPI_JosephGF.Controllers
             }
 
             return user;
+        }
+        //este get valida el usuario que quiere ingresar en la app
+        //GET: api/Users
+        [HttpGet("ValidateLogin")]
+        public async Task<ActionResult<User>> ValidateLogin(string username, string password)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(e => e.Email.Equals
+            (username) && e.Password == password);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
         }
 
         // PUT: api/Users/5
