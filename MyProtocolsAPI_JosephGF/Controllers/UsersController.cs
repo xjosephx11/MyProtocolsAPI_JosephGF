@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyProtocolsAPI_JosephGF.Attributes;
 using MyProtocolsAPI_JosephGF.Models;
+using MyProtocolsAPI_JosephGF.ModelsDTOs;
 
 namespace MyProtocolsAPI_JosephGF.Controllers
 {
@@ -26,10 +27,10 @@ namespace MyProtocolsAPI_JosephGF.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
             return await _context.Users.ToListAsync();
         }
 
@@ -37,10 +38,10 @@ namespace MyProtocolsAPI_JosephGF.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
             var user = await _context.Users.FindAsync(id);
 
             if (user == null)
@@ -62,6 +63,54 @@ namespace MyProtocolsAPI_JosephGF.Controllers
                 return NotFound();
             }
             return Ok(user);
+        }
+
+        [HttpGet("GetUserInfoByEmail")]
+        public ActionResult<IEnumerable<UserDTO>> GetUserInfoByEmail(string Pemail) 
+        {
+            //aqui se crea un linq que combina info de 2 entidades
+            //(user inner join userrole) y la agrega en el objeto dto de usuario
+            var query = (from u in _context.Users
+                         join ur in _context.UserRoles on 
+                         u.UserRoleId equals ur.UserRoleId
+                         where u.Email == Pemail && u.Active == true &&
+                         u.IsBlocked == false 
+                         select new 
+                         {
+                             idusuario = u.UserId,
+                             correo = u.Email,
+                             contrasenia = u.Password,
+                             nombre = u.Name,
+                             correorespaldo = u.BackUpEmail,
+                             telefono = u.PhoneNumber,
+                             direccion = u.Address,
+                             activo = u.Active,
+                             establoqueado = u.IsBlocked,
+                             idrol = ur.UserRoleId,
+                             descripcionrol = ur.Description
+                         }).ToList();
+            //creamos un objeto del tipo que retorna la funcion/ruta
+            List<UserDTO> list = new List<UserDTO> ();
+            foreach (var item in query)
+            { 
+                UserDTO NewItem = new UserDTO()
+                {
+                    IDUsuario = item.idusuario,
+                    Correo = item.correo,
+                    Contrasenia = item.contrasenia,
+                    Nombre = item.nombre,
+                    CorreoRespaldo = item.correorespaldo,
+                    Telefono = item.telefono,
+                    Direccion = item.direccion,
+                    Activo = item.activo,
+                    EstaBloqueado = item.establoqueado,
+                    IdRol = item.idrol,
+                    DescripcionRol = item.descripcionrol
+                };
+                list.Add (NewItem);
+            }
+            if (list == null) { return NotFound(); }
+            return list;
         }
 
         // PUT: api/Users/5
