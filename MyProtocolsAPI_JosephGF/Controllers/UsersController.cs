@@ -116,14 +116,40 @@ namespace MyProtocolsAPI_JosephGF.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, UserDTO user)
         {
-            if (id != user.UserId)
+            if (id != user.IDUsuario)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+
+            //tenemos que hacer la convercion entre el dto que llega en formato
+            //json  en el header y el objeto que entity framework entiende que es
+            //de tipo user
+
+            User? NewEFUser = GetUSerByID(id);
+            if (NewEFUser != null)
+            {
+                NewEFUser.Email = user.Correo;
+                NewEFUser.Name = user.Nombre;
+                NewEFUser.BackUpEmail = user.CorreoRespaldo;
+                NewEFUser.PhoneNumber = user.Telefono;
+                NewEFUser.Address = user.Direccion;
+
+                _context.Entry(NewEFUser).State = EntityState.Modified;
+            }
+
+            //User NewEFUser = new() 
+            //{
+            //    UserId = user.IDUsuario,
+            //    Email = user.Correo,
+            //    Name = user.Nombre,
+            //    BackUpEmail = user.CorreoRespaldo,
+            //    PhoneNumber = user.Telefono,
+            //    Address = user.Direccion,
+
+            //}; 
 
             try
             {
@@ -141,8 +167,59 @@ namespace MyProtocolsAPI_JosephGF.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok();
         }
+
+        //[HttpPut("{idPassword}")]
+        //public async Task<IActionResult> PutUserPassword(int id, UserDTO user)
+        //{
+        //    if (id != user.IDUsuario)
+        //    {
+        //        return BadRequest();
+        //    }
+
+
+        //    //tenemos que hacer la convercion entre el dto que llega en formato
+        //    //json  en el header y el objeto que entity framework entiende que es
+        //    //de tipo user
+
+        //    User? NewEFUser = GetUSerByID(id);
+        //    if (NewEFUser != null)
+        //    {
+        //        NewEFUser.Password = user.Contrasenia;
+
+        //        _context.Entry(NewEFUser).State = EntityState.Modified;
+        //    }
+
+        //    //User NewEFUser = new() 
+        //    //{
+        //    //    UserId = user.IDUsuario,
+        //    //    Email = user.Correo,
+        //    //    Name = user.Nombre,
+        //    //    BackUpEmail = user.CorreoRespaldo,
+        //    //    PhoneNumber = user.Telefono,
+        //    //    Address = user.Direccion,
+
+        //    //}; 
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!UserExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return Ok();
+        //}
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -183,6 +260,12 @@ namespace MyProtocolsAPI_JosephGF.Controllers
         private bool UserExists(int id)
         {
             return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
+        }
+
+        private User? GetUSerByID(int id) 
+        {
+            var user = _context.Users.Find(id);
+            return user;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MyProtocolsAPI_JosephGF.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Apikey]
+    //[Apikey]
     public class ProtocolsController : ControllerBase
     {
         private readonly MyProtocolsDBContext _context;
@@ -49,6 +49,26 @@ namespace MyProtocolsAPI_JosephGF.Controllers
             }
 
             return protocol;
+        }
+
+        //GET: api/Protocols/GetProtocolListByUser?id=3
+        //pensando en colecciones  observables esta  funcion podria entregar
+        //un  enumerable (obbiamenteusamos su interface)
+        [HttpGet("GetProtocolListByUser")]
+        public async Task<ActionResult<IEnumerable <Protocol>>> GetProtocolListByUser(int id)
+        {
+            if (_context.Protocols == null)
+            {
+                return NotFound();
+            }
+            var protocolList = await _context.Protocols.Where(p => p.UserId.Equals(id)).ToListAsync();
+;
+            if (protocolList == null)
+            {
+                return NotFound();
+            }
+
+            return protocolList;
         }
 
         // PUT: api/Protocols/5
